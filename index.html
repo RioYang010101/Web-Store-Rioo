@@ -179,6 +179,42 @@
 
   let cekInterval = null;
 
+  // Simpan transaksi aktif ke localStorage
+  function saveTransaction(data) {
+    localStorage.setItem('transaksiActive', JSON.stringify(data));
+  }
+  // Hapus transaksi dari localStorage
+  function clearTransaction() {
+    localStorage.removeItem('transaksiActive');
+  }
+
+  // Cek dan load transaksi aktif saat halaman dimuat ulang
+  async function loadLastTransaction() {
+    const saved = localStorage.getItem('transaksiActive');
+    if (!saved) return;
+
+    const transaksi = JSON.parse(saved);
+    const { amount, productName, qrisUrl, startTime } = transaksi;
+
+    document.getElementById('qrisImage').src = qrisUrl;
+    document.getElementById('qrisModal').style.display = 'flex';
+    window.selectedProduct = productName;
+
+    if (cekInterval) clearInterval(cekInterval);
+
+    cekInterval = setInterval(async () => {
+      const sudahBayar = await checkTransfer(amount, new Date(startTime));
+      if (sudahBayar) {
+        alert("Pembayaran sudah diterima, terima kasih!");
+        clearInterval(cekInterval);
+        cekInterval = null;
+        closeQRIS();
+        clearTransaction();
+        openConfirm();
+      }
+    }, 10000);
+  }
+
   async function loadProducts() {
     try {
       const res = await fetch('products.json');
@@ -206,20 +242,31 @@
       const data = await response.json();
 
       if (data.status && data.result && data.result.imageqris && data.result.imageqris.url) {
-        document.getElementById('qrisImage').src = data.result.imageqris.url;
+        const qrisUrl = data.result.imageqris.url;
+        document.getElementById('qrisImage').src = qrisUrl;
         document.getElementById('qrisModal').style.display = 'flex';
         window.selectedProduct = productName;
 
         const startTime = new Date();
+
+        // Simpan transaksi aktif ke localStorage
+        saveTransaction({
+          amount,
+          productName,
+          qrisUrl,
+          startTime: startTime.toISOString()
+        });
 
         if(cekInterval) clearInterval(cekInterval);
 
         cekInterval = setInterval(async () => {
           const sudahBayar = await checkTransfer(amount, startTime);
           if(sudahBayar) {
+            alert("Pembayaran sudah diterima, terima kasih!");
             clearInterval(cekInterval);
             cekInterval = null;
             closeQRIS();
+            clearTransaction();
             openConfirm();
           }
         }, 10000);
@@ -240,6 +287,7 @@
       clearInterval(cekInterval);
       cekInterval = null;
     }
+    clearTransaction();
   }
 
   function redirectWA() {
@@ -248,7 +296,7 @@
     window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
   }
 
-  // Modal konfirmasi pembayaran
+  // Modal konfirmasi pembayaran sukses
   function openConfirm() {
     document.getElementById('confirmModal').style.display = 'flex';
   }
@@ -296,7 +344,10 @@
     }
   }
 
-  loadProducts();
+  window.addEventListener('load', () => {
+    loadProducts();
+    loadLastTransaction();
+  });
 </script>
 
 </body>
