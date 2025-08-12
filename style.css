@@ -23,14 +23,14 @@ header {
 
 #sideMenu {
     position: fixed;
-    right: -200px;
+    right: -220px;
     top: 0;
-    width: 200px;
+    width: 220px;
     height: 100%;
     background: #1f1f1f;
-    padding-top: 50px;
     transition: 0.3s;
     box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+    padding-top: 10px;
 }
 
 #sideMenu a {
@@ -47,6 +47,14 @@ header {
 
 #sideMenu.show {
     right: 0;
+}
+
+.close-btn {
+    text-align: right;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #ff9800;
 }
 
 #product-list {
