@@ -1,16 +1,17 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #121212;
-    color: white;
+    background-color: #000000; /* Hitam */
+    color: #ffffff; /* Putih */
 }
 
 header {
-    background: #ff9800;
+    background: #000000;
     color: white;
     padding: 15px;
     text-align: center;
     position: relative;
+    border-bottom: 1px solid #444;
 }
 
 .menu-icon {
@@ -27,9 +28,8 @@ header {
     top: 0;
     width: 220px;
     height: 100%;
-    background: #1f1f1f;
+    background: #111; /* Hitam lebih terang */
     transition: 0.3s;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
     padding-top: 10px;
 }
 
@@ -54,7 +54,7 @@ header {
     padding: 10px;
     cursor: pointer;
     font-size: 20px;
-    color: #ff9800;
+    color: white;
 }
 
 #product-list {
@@ -65,45 +65,45 @@ header {
 }
 
 .product {
-    background: #1f1f1f;
+    background: #111; /* Hitam keabu-abuan */
+    border: 1px solid #444; /* Border abu tipis */
     border-radius: 8px;
     padding: 10px;
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 .product img {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 6px;
+    border-bottom: 1px solid #444;
 }
 
 .product h3 {
     margin: 10px 0 5px;
-    color: #ff9800;
+    color: #ffffff;
 }
 
 .product p {
-    color: #ccc;
+    color: #cccccc;
     font-size: 14px;
 }
 
 .price {
     font-weight: bold;
-    color: #ff5722;
+    color: #ffffff;
 }
 
 .btn-order {
     display: inline-block;
     margin-top: 8px;
-    background: #4CAF50;
-    color: white;
+    background: #ffffff; /* Putih */
+    color: #000000; /* Hitam */
     padding: 8px 15px;
     border-radius: 5px;
     text-decoration: none;
 }
 
 .btn-order:hover {
-    background: #45a049;
+    background: #dddddd;
 }
