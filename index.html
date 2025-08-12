@@ -1,139 +1,118 @@
 <!DOCTYPE html>
 <html lang="id">
-<head><!DOCTYPE html>
-<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Jualan Rioo</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <h1 class="logo">Rioo Store</h1>
-        <div class="menu-toggle" id="menu-toggle">&#9776;</div>
-    </header>
-
-    <nav id="menu" class="hidden">
-        <div class="close-btn" id="close-btn">&times;</div>
-        <a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank">Testi Rioo</a>
-    </nav>
-
-    <main>
-        <h2>Selamat Datang di Toko Rioo</h2>
-        <p>Tempat jualan barang-barang terbaik.</p>
-    </main>
-
-    <script src="script.js"></script>
-</body>
-</html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jualan Rioo</title>
+<title>Toko Rioo</title>
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #000;
-    color: #fff;
-  }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: #111;
-  }
-  header h1 {
-    font-size: 20px;
-    margin: 0;
-  }
-  .menu-toggle {
-    font-size: 28px;
-    cursor: pointer;
-  }
-  nav {
-    position: fixed;
-    top: 0;
-    right: -250px;
-    height: 100%;
-    width: 250px;
-    background-color: #111;
-    transition: right 0.3s ease;
-    padding: 20px;
-  }
-  nav.active {
-    right: 0;
-  }
-  .close-btn {
-    font-size: 28px;
-    cursor: pointer;
-    display: block;
-    text-align: right;
-  }
-  nav ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-  }
-  nav ul li {
-    margin: 15px 0;
-  }
-  nav ul li a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 18px;
-  }
-  .content {
-    padding: 20px;
-  }
-  .btn-testi {
-    background-color: #fff;
-    color: #000;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: bold;
-    border-radius: 5px;
-  }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000; /* Latar hitam */
+        color: white; /* Teks putih */
+    }
+    header {
+        background-color: #111;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #333;
+    }
+    header h1 {
+        font-size: 1.5em;
+        margin: 0;
+    }
+    nav {
+        display: none;
+        flex-direction: column;
+        background-color: #111;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        border-left: 1px solid #333;
+    }
+    nav a {
+        padding: 15px;
+        text-decoration: none;
+        color: white;
+        border-bottom: 1px solid #333;
+    }
+    nav a:hover {
+        background-color: #222;
+    }
+    .hamburger {
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    .product-card {
+        background-color: #111;
+        border: 1px solid #333;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+    }
+    .product-card img {
+        max-width: 100%;
+        border-radius: 5px;
+    }
+    .buy-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 15px;
+        background-color: white;
+        color: black;
+        border-radius: 3px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .buy-btn:hover {
+        background-color: #ddd;
+    }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Jualan Rioo</h1>
-  <span class="menu-toggle">&#9776;</span>
+    <h1>Toko Rioo</h1>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
-<nav id="sidebar">
-  <span class="close-btn">&times;</span>
-  <ul>
-    <li><a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank">Testi Rioo</a></li>
-    <li><a href="#">Produk</a></li>
-    <li><a href="#">Tentang</a></li>
-  </ul>
+<nav id="menu">
+    <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20lihat%20testimoni" target="_blank">Testi Rioo</a>
+    <a href="javascript:void(0)" onclick="toggleMenu()">❌ Tutup</a>
 </nav>
 
-<div class="content">
-  <h2>Selamat Datang di Jualan Rioo</h2>
-  <p>Tempat jualan simple dengan tema hitam putih.</p>
-  <a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank" class="btn-testi">Testi Rioo</a>
-</div>
+<section class="product-grid">
+    <div class="product-card">
+        <img src="https://via.placeholder.com/250" alt="Produk 1">
+        <h2>Produk 1</h2>
+        <p>Deskripsi singkat produk 1.</p>
+        <p><strong>Rp 100.000</strong></p>
+        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%201" target="_blank" class="buy-btn">Beli Sekarang</a>
+    </div>
+
+    <div class="product-card">
+        <img src="https://via.placeholder.com/250" alt="Produk 2">
+        <h2>Produk 2</h2>
+        <p>Deskripsi singkat produk 2.</p>
+        <p><strong>Rp 200.000</strong></p>
+        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%202" target="_blank" class="buy-btn">Beli Sekarang</a>
+    </div>
+</section>
 
 <script>
-  const menuToggle = document.querySelector('.menu-toggle');
-  const sidebar = document.getElementById('sidebar');
-  const closeBtn = document.querySelector('.close-btn');
-
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.add('active');
-  });
-
-  closeBtn.addEventListener('click', () => {
-    sidebar.classList.remove('active');
-  });
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+}
 </script>
 
 </body>
