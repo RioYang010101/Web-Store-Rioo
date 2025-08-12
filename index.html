@@ -1,156 +1,210 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Toko Rioo</title>
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #000;
-        color: white;
-    }
-    header {
-        background-color: #111;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #333;
-    }
-    header h1 {
-        font-size: 1.5em;
-        margin: 0;
-    }
-    nav {
-        display: none;
-        flex-direction: column;
-        background-color: #111;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        width: 200px;
-        border-left: 1px solid #333;
-    }
-    nav a {
-        padding: 15px;
-        text-decoration: none;
-        color: white;
-        border-bottom: 1px solid #333;
-    }
-    nav a:hover {
-        background-color: #222;
-    }
-    .hamburger {
-        font-size: 24px;
-        cursor: pointer;
-    }
-    .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        padding: 20px;
-    }
-    .product-card {
-        background-color: #111;
-        border: 1px solid #333;
-        border-radius: 5px;
-        padding: 10px;
-        text-align: center;
-    }
-    .product-card img {
-        max-width: 100%;
-        border-radius: 5px;
-    }
-    .buy-btn {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 8px 15px;
-        background-color: white;
-        color: black;
-        border-radius: 3px;
-        text-decoration: none;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .buy-btn:hover {
-        background-color: #ddd;
-    }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: white;
+  }
+  header {
+    background-color: #111;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+  }
+  header h1 {
+    font-size: 1.5em;
+    margin: 0;
+  }
+  nav {
+    display: none;
+    flex-direction: column;
+    background-color: #111;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 200px;
+    border-left: 1px solid #333;
+  }
+  nav a {
+    padding: 15px;
+    text-decoration: none;
+    color: white;
+    border-bottom: 1px solid #333;
+  }
+  nav a:hover {
+    background-color: #222;
+  }
+  .hamburger {
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .product-card {
+    background-color: #111;
+    border: 1px solid #333;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+  }
+  .product-card img {
+    max-width: 100%;
+    border-radius: 5px;
+  }
+  .buy-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: white;
+    color: black;
+    border-radius: 3px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .buy-btn:hover {
+    background-color: #ddd;
+  }
+  /* Modal QRIS */
+  #qrisModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+  }
+  #qrisModal > div {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 300px;
+    color: black;
+  }
+  #qrisModal img {
+    width: 250px;
+    height: auto;
+  }
+  #qrisModal button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #qrisModal button:first-of-type {
+    background-color: #4CAF50;
+    color: white;
+  }
+  #qrisModal button:last-of-type {
+    background-color: #f44336;
+    color: white;
+    margin-top: 15px;
+  }
 </style>
 </head>
 <body>
 
 <header>
-    <h1>🛒 Produk Rioo</h1>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <h1>🛒 Produk Rioo</h1>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
 <nav id="menu">
-    <a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank">Testi Rioo</a>
-    <a href="javascript:void(0)" onclick="toggleMenu()">❌ Tutup</a>
+  <a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank">Testi Rioo</a>
+  <a href="javascript:void(0)" onclick="toggleMenu()">❌ Tutup</a>
 </nav>
 
 <section class="product-grid" id="productGrid"></section>
 
 <!-- Modal QRIS -->
-<div id="qrisModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center;">
-  <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; max-width:300px; color:black;">
+<div id="qrisModal">
+  <div>
     <h3>Scan QRIS untuk bayar</h3>
-    <img id="qrisImage" src="" style="width:250px; height:auto;">
-    <br><br>
+    <img id="qrisImage" src="" alt="QRIS" />
+    <br />
     <button onclick="redirectWA()">Saya sudah bayar</button>
-    <br><br>
+    <br />
     <button onclick="closeQRIS()">Tutup</button>
   </div>
 </div>
 
 <script>
-function toggleMenu() {
+  function toggleMenu() {
     const menu = document.getElementById('menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-}
+  }
 
-const qrisStaticCode = "00020101021126670016COM.NOBUBANK.WWW01189360050300000879140214515019284587300303UMI51440014ID.CO.QRIS.WWW0215ID20254044536930303UMI5204541153033605802ID5920RIOO STORE OK24485676015PADANG LAWAS UT61052274062070703A016304B11F";
+  const qrisStaticCode = "00020101021126670016COM.NOBUBANK.WWW01189360050300000879140214515019284587300303UMI51440014ID.CO.QRIS.WWW0215ID20254044536930303UMI5204541153033605802ID5920RIOO STORE OK24485676015PADANG LAWAS UT61052274062070703A016304B11F";
 
-async function loadProducts() {
+  async function loadProducts() {
     try {
-        const res = await fetch('products.json');
-        const products = await res.json();
-        const grid = document.getElementById('productGrid');
-        grid.innerHTML = products.map(p => `
-            <div class="product-card">
-                <img src="${p.image}" alt="${p.name}">
-                <h2>${p.name}</h2>
-                <p>${p.desc}</p>
-                <p><strong>Rp ${p.price.toLocaleString('id-ID')}</strong></p>
-                <button class="buy-btn" onclick="showQRIS(${p.price}, '${p.name}')">Beli Sekarang</button>
-            </div>
-        `).join('');
+      const res = await fetch('products.json');
+      const products = await res.json();
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = products.map(p => `
+          <div class="product-card">
+              <img src="${p.image}" alt="${p.name}">
+              <h2>${p.name}</h2>
+              <p>${p.desc}</p>
+              <p><strong>Rp ${p.price.toLocaleString('id-ID')}</strong></p>
+              <button class="buy-btn" onclick="showQRIS(${p.price}, '${p.name}')">Beli Sekarang</button>
+          </div>
+      `).join('');
     } catch (err) {
-        console.error('Gagal memuat produk:', err);
+      console.error('Gagal memuat produk:', err);
     }
-}
+  }
 
-function showQRIS(amount, productName) {
-    const apiUrl = "https://api-docs-nvidia2.vercel.app/orderkuota/createpayment";
-    const params = `?amount=${amount}&codeqr=${encodeURIComponent(qrisStaticCode)}`;
-    document.getElementById('qrisImage').src = apiUrl + params;
-    document.getElementById('qrisModal').style.display = 'flex';
-    window.selectedProduct = productName;
-}
+  async function showQRIS(amount, productName) {
+    try {
+      const apiUrl = "https://api-docs-nvidia2.vercel.app/orderkuota/createpayment";
+      const params = `?amount=${amount}&codeqr=${encodeURIComponent(qrisStaticCode)}`;
+      const response = await fetch(apiUrl + params);
+      const data = await response.json();
 
-function closeQRIS() {
+      if (data.status && data.result && data.result.imageqris && data.result.imageqris.url) {
+        document.getElementById('qrisImage').src = data.result.imageqris.url;
+        document.getElementById('qrisModal').style.display = 'flex';
+        window.selectedProduct = productName;
+      } else {
+        alert('Gagal mendapatkan QRIS dari server.');
+        console.error('Response API tidak valid:', data);
+      }
+    } catch (error) {
+      alert('Terjadi kesalahan saat memuat QRIS.');
+      console.error(error);
+    }
+  }
+
+  function closeQRIS() {
     document.getElementById('qrisModal').style.display = 'none';
-}
+  }
 
-function redirectWA() {
+  function redirectWA() {
     const waNumber = "6282116656234";
     const message = `Halo Rioo, saya sudah membayar untuk ${window.selectedProduct}, berikut bukti transfer saya.`;
     window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
-}
+  }
 
-loadProducts();
+  loadProducts();
 </script>
 
 </body>
