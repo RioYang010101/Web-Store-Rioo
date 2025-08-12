@@ -72,6 +72,7 @@
         border-radius: 3px;
         text-decoration: none;
         font-weight: bold;
+        cursor: pointer;
     }
     .buy-btn:hover {
         background-color: #ddd;
@@ -92,11 +93,25 @@
 
 <section class="product-grid" id="productGrid"></section>
 
+<!-- Modal QRIS -->
+<div id="qrisModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:20px; border-radius:10px; text-align:center; max-width:300px; color:black;">
+    <h3>Scan QRIS untuk bayar</h3>
+    <img id="qrisImage" src="" style="width:250px; height:auto;">
+    <br><br>
+    <button onclick="redirectWA()">Saya sudah bayar</button>
+    <br><br>
+    <button onclick="closeQRIS()">Tutup</button>
+  </div>
+</div>
+
 <script>
 function toggleMenu() {
     const menu = document.getElementById('menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
 }
+
+const qrisStaticCode = "00020101021126670016COM.NOBUBANK.WWW01189360050300000879140214515019284587300303UMI51440014ID.CO.QRIS.WWW0215ID20254044536930303UMI5204541153033605802ID5920RIOO STORE OK24485676015PADANG LAWAS UT61052274062070703A016304B11F";
 
 async function loadProducts() {
     try {
@@ -109,13 +124,30 @@ async function loadProducts() {
                 <h2>${p.name}</h2>
                 <p>${p.desc}</p>
                 <p><strong>Rp ${p.price.toLocaleString('id-ID')}</strong></p>
-                <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20${encodeURIComponent(p.name)}"
-                   target="_blank" class="buy-btn">Beli Sekarang</a>
+                <button class="buy-btn" onclick="showQRIS(${p.price}, '${p.name}')">Beli Sekarang</button>
             </div>
         `).join('');
     } catch (err) {
         console.error('Gagal memuat produk:', err);
     }
+}
+
+function showQRIS(amount, productName) {
+    const apiUrl = "https://api-docs-nvidia2.vercel.app/orderkuota/createpayment";
+    const params = `?amount=${amount}&codeqr=${encodeURIComponent(qrisStaticCode)}`;
+    document.getElementById('qrisImage').src = apiUrl + params;
+    document.getElementById('qrisModal').style.display = 'flex';
+    window.selectedProduct = productName;
+}
+
+function closeQRIS() {
+    document.getElementById('qrisModal').style.display = 'none';
+}
+
+function redirectWA() {
+    const waNumber = "6282116656234";
+    const message = `Halo Rioo, saya sudah membayar untuk ${window.selectedProduct}, berikut bukti transfer saya.`;
+    window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
 }
 
 loadProducts();
