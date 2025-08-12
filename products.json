@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Kaos Polos Hitam",
+        "price": 50000,
+        "desc": "Kaos polos bahan cotton combed 30s, nyaman dipakai.",
+        "image": "https://i.ibb.co/0G7G0fp/kaos-hitam.jpg"
+    },
+    {
+        "name": "Topi Baseball",
+        "price": 35000,
+        "desc": "Topi casual cocok untuk sehari-hari.",
+        "image": "https://i.ibb.co/k3FgM77/topi.jpg"
+    },
+    {
+        "name": "Sepatu Sneakers",
+        "price": 150000,
+        "desc": "Sneakers keren untuk gaya santai.",
+        "image": "https://i.ibb.co/vBJc5Bf/sneakers.jpg"
+    }
+]
