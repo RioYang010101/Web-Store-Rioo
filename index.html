@@ -8,8 +8,8 @@
     body {
         margin: 0;
         font-family: Arial, sans-serif;
-        background-color: #000; /* Latar hitam */
-        color: white; /* Teks putih */
+        background-color: #000;
+        color: white;
     }
     header {
         background-color: #111;
@@ -90,29 +90,35 @@
     <a href="javascript:void(0)" onclick="toggleMenu()">❌ Tutup</a>
 </nav>
 
-<section class="product-grid">
-    <div class="product-card">
-        <img src="https://via.placeholder.com/250" alt="Produk 1">
-        <h2>Produk 1</h2>
-        <p>Deskripsi singkat produk 1.</p>
-        <p><strong>Rp 100.000</strong></p>
-        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%201" target="_blank" class="buy-btn">Beli Sekarang</a>
-    </div>
-
-    <div class="product-card">
-        <img src="https://via.placeholder.com/250" alt="Produk 2">
-        <h2>Produk 2</h2>
-        <p>Deskripsi singkat produk 2.</p>
-        <p><strong>Rp 200.000</strong></p>
-        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%202" target="_blank" class="buy-btn">Beli Sekarang</a>
-    </div>
-</section>
+<section class="product-grid" id="productGrid"></section>
 
 <script>
 function toggleMenu() {
     const menu = document.getElementById('menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
 }
+
+async function loadProducts() {
+    try {
+        const res = await fetch('products.json');
+        const products = await res.json();
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = products.map(p => `
+            <div class="product-card">
+                <img src="${p.image}" alt="${p.name}">
+                <h2>${p.name}</h2>
+                <p>${p.desc}</p>
+                <p><strong>Rp ${p.price.toLocaleString('id-ID')}</strong></p>
+                <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20${encodeURIComponent(p.name)}"
+                   target="_blank" class="buy-btn">Beli Sekarang</a>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('Gagal memuat produk:', err);
+    }
+}
+
+loadProducts();
 </script>
 
 </body>
