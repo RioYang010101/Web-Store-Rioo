@@ -93,6 +93,7 @@
     border-radius: 10px;
     max-width: 320px;
     text-align: center;
+    position: relative;
   }
   .modal img {
     width: 250px;
@@ -110,10 +111,6 @@
     cursor: pointer;
     font-weight: bold;
   }
-  .modal button.confirm-btn {
-    background-color: #4CAF50;
-    color: white;
-  }
   .modal button.cancel-btn {
     background-color: #f44336;
     color: white;
@@ -125,6 +122,12 @@
     margin-top: 15px;
     width: 100%;
     font-size: 16px;
+  }
+  #countdownTimer {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: red;
   }
 </style>
 </head>
@@ -144,24 +147,12 @@
 
 <!-- Modal QRIS -->
 <div id="qrisModal" class="modal">
-  <div>
+  <div id="modalContent">
+    <div id="countdownTimer">Waktu tersisa: 05:00</div>
     <h3>Scan QRIS untuk bayar</h3>
     <img id="qrisImage" src="" alt="QRIS" />
     <p>Jika Sudah Transfer Mohon Di Screenshot.</p>
-    <button class="confirm-btn" onclick="redirectWA()">Saya sudah bayar</button>
-    <br />
     <button class="cancel-btn" onclick="closeQRIS()">Tutup</button>
-  </div>
-</div>
-
-<!-- Modal Konfirmasi Transfer -->
-<div id="confirmModal" class="modal">
-  <div>
-    <h3>Pembayaran Diterima!</h3>
-    <p>Silahkan Chat Nomor Saya Di Bawah.</p>
-    <button class="chat-wa-btn" onclick="chatWA()">Chat WhatsApp</button>
-    <br />
-    <button class="cancel-btn" onclick="closeConfirm()">Tutup</button>
   </div>
 </div>
 
@@ -173,22 +164,55 @@
 
   const qrisStaticCode = "00020101021126670016COM.NOBUBANK.WWW01189360050300000879140214515019284587300303UMI51440014ID.CO.QRIS.WWW0215ID20254044536930303UMI5204541153033605802ID5920RIOO STORE OK24485676015PADANG LAWAS UT61052274062070703A016304B11F";
 
-  // Ganti username dan token sesuai akun kamu
   const username = "rioooox";
   const token = "2448567:D8PZysUdtkzGeVroSKE92hOI1m4BivJ0";
 
   let cekInterval = null;
+  let countdownInterval = null;
+  const qrisTimeoutSeconds = 300; // 5 menit
 
-  // Simpan transaksi aktif ke localStorage
   function saveTransaction(data) {
     localStorage.setItem('transaksiActive', JSON.stringify(data));
   }
-  // Hapus transaksi dari localStorage
+
   function clearTransaction() {
     localStorage.removeItem('transaksiActive');
   }
 
-  // Cek dan load transaksi aktif saat halaman dimuat ulang
+  function formatTime(seconds) {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function startCountdown(startTime) {
+    const timerElem = document.getElementById('countdownTimer');
+    let elapsedSeconds = 0;
+
+    if(countdownInterval) clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+      elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = qrisTimeoutSeconds - elapsedSeconds;
+
+      if (remaining <= 0) {
+        timerElem.textContent = "QRIS sudah expired.";
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        alert("Waktu pembayaran sudah habis. Silahkan buat pembayaran ulang.");
+        closeQRIS();
+        clearTransaction();
+        if(cekInterval) {
+          clearInterval(cekInterval);
+          cekInterval = null;
+        }
+        return;
+      }
+
+      timerElem.textContent = `Waktu tersisa: ${formatTime(remaining)}`;
+    }, 1000);
+  }
+
   async function loadLastTransaction() {
     const saved = localStorage.getItem('transaksiActive');
     if (!saved) return;
@@ -196,23 +220,7 @@
     const transaksi = JSON.parse(saved);
     const { amount, productName, qrisUrl, startTime } = transaksi;
 
-    document.getElementById('qrisImage').src = qrisUrl;
-    document.getElementById('qrisModal').style.display = 'flex';
-    window.selectedProduct = productName;
-
-    if (cekInterval) clearInterval(cekInterval);
-
-    cekInterval = setInterval(async () => {
-      const sudahBayar = await checkTransfer(amount, new Date(startTime));
-      if (sudahBayar) {
-        alert("Pembayaran sudah diterima, terima kasih!");
-        clearInterval(cekInterval);
-        cekInterval = null;
-        closeQRIS();
-        clearTransaction();
-        openConfirm();
-      }
-    }, 10000);
+    showQrisModal(amount, productName, qrisUrl, new Date(startTime).getTime());
   }
 
   async function loadProducts() {
@@ -226,7 +234,7 @@
               <h2>${p.name}</h2>
               <p>${p.desc}</p>
               <p><strong>Rp ${p.price.toLocaleString('id-ID')}</strong></p>
-              <button class="buy-btn" onclick="showQRIS(${p.price}, '${p.name}')">Beli Sekarang</button>
+              <button class="buy-btn" onclick="createPayment(${p.price}, '${p.name}')">Beli Sekarang</button>
           </div>
       `).join('');
     } catch (err) {
@@ -234,7 +242,7 @@
     }
   }
 
-  async function showQRIS(amount, productName) {
+  async function createPayment(amount, productName) {
     try {
       const apiUrl = "https://api-docs-nvidia2.vercel.app/orderkuota/createpayment";
       const params = `?amount=${amount}&codeqr=${encodeURIComponent(qrisStaticCode)}`;
@@ -243,34 +251,7 @@
 
       if (data.status && data.result && data.result.imageqris && data.result.imageqris.url) {
         const qrisUrl = data.result.imageqris.url;
-        document.getElementById('qrisImage').src = qrisUrl;
-        document.getElementById('qrisModal').style.display = 'flex';
-        window.selectedProduct = productName;
-
-        const startTime = new Date();
-
-        // Simpan transaksi aktif ke localStorage
-        saveTransaction({
-          amount,
-          productName,
-          qrisUrl,
-          startTime: startTime.toISOString()
-        });
-
-        if(cekInterval) clearInterval(cekInterval);
-
-        cekInterval = setInterval(async () => {
-          const sudahBayar = await checkTransfer(amount, startTime);
-          if(sudahBayar) {
-            alert("Pembayaran sudah diterima, terima kasih!");
-            clearInterval(cekInterval);
-            cekInterval = null;
-            closeQRIS();
-            clearTransaction();
-            openConfirm();
-          }
-        }, 10000);
-
+        showQrisModal(amount, productName, qrisUrl, Date.now());
       } else {
         alert('Gagal mendapatkan QRIS dari server.');
         console.error('Response API tidak valid:', data);
@@ -281,28 +262,70 @@
     }
   }
 
+  function showQrisModal(amount, productName, qrisUrl, startTimestamp) {
+    window.selectedProduct = productName;
+    document.getElementById('qrisImage').src = qrisUrl;
+    document.getElementById('qrisModal').style.display = 'flex';
+
+    // Reset modal content to default payment view
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+      <div id="countdownTimer">Waktu tersisa: 05:00</div>
+      <h3>Scan QRIS untuk bayar</h3>
+      <img id="qrisImage" src="${qrisUrl}" alt="QRIS" />
+      <p>Jika Sudah Transfer Mohon Di Screenshot.</p>
+      <button class="cancel-btn" onclick="closeQRIS()">Tutup</button>
+    `;
+
+    // Save transaction to localStorage
+    saveTransaction({
+      amount,
+      productName,
+      qrisUrl,
+      startTime: new Date(startTimestamp).toISOString()
+    });
+
+    startCountdown(startTimestamp);
+
+    if(cekInterval) clearInterval(cekInterval);
+
+    cekInterval = setInterval(async () => {
+      const sudahBayar = await checkTransfer(amount, new Date(startTimestamp));
+      if (sudahBayar) {
+        clearInterval(cekInterval);
+        cekInterval = null;
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+
+        showSuccessModal();
+        clearTransaction();
+      }
+    }, 10000);
+  }
+
+  function showSuccessModal() {
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+      <h3 style="color:green;">Pembayaran Berhasil!</h3>
+      <p>Silahkan Chat Nomor Saya Di Bawah.</p>
+      <button class="chat-wa-btn" onclick="chatWA()">Chat WhatsApp</button>
+      <button class="cancel-btn" onclick="closeQRIS()" style="margin-top:10px;">Tutup</button>
+    `;
+  }
+
   function closeQRIS() {
     document.getElementById('qrisModal').style.display = 'none';
     if(cekInterval) {
       clearInterval(cekInterval);
       cekInterval = null;
     }
+    if(countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
     clearTransaction();
   }
 
-  function redirectWA() {
-    const waNumber = "6282116656234";
-    const message = `Halo Rioo, saya sudah membayar untuk ${window.selectedProduct}, berikut bukti transfer saya.`;
-    window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
-  }
-
-  // Modal konfirmasi pembayaran sukses
-  function openConfirm() {
-    document.getElementById('confirmModal').style.display = 'flex';
-  }
-  function closeConfirm() {
-    document.getElementById('confirmModal').style.display = 'none';
-  }
   function chatWA() {
     const waNumber = "6282116656234";
     const message = `Halo Rioo, saya sudah transfer untuk ${window.selectedProduct}. Mohon Bawa Bukti Transfer.`;
@@ -320,12 +343,11 @@
       }
       const targetAmount = Number(String(amount).replace(/\./g, '').replace(/,/g, ''));
 
-      const sudahBayar = data.result.some(tx => {
+      return data.result.some(tx => {
         if(tx.status !== "IN") return false;
 
         const kreditStr = tx.kredit.replace(/\./g, '').replace(/,/g, '');
         const kreditNum = Number(kreditStr);
-
         if(isNaN(kreditNum)) return false;
 
         const parts = tx.tanggal.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/);
@@ -335,8 +357,6 @@
 
         return kreditNum >= targetAmount && txDate >= startTime;
       });
-
-      return sudahBayar;
 
     } catch (error) {
       console.error("Gagal fetch mutasi", error);
