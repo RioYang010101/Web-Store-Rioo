@@ -77,31 +77,32 @@
   .buy-btn:hover {
     background-color: #ddd;
   }
-  /* Modal QRIS */
-  #qrisModal {
+  /* Modal styling */
+  .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.8);
     justify-content: center;
     align-items: center;
   }
-  #qrisModal > div {
+  .modal > div {
     background: #fff;
+    color: black;
     padding: 20px;
     border-radius: 10px;
+    max-width: 320px;
     text-align: center;
-    max-width: 300px;
-    color: black;
   }
-  #qrisModal img {
+  .modal img {
     width: 250px;
     height: auto;
   }
-  #qrisModal button {
+  .modal p {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  .modal button {
     margin-top: 10px;
     padding: 8px 15px;
     border: none;
@@ -109,14 +110,21 @@
     cursor: pointer;
     font-weight: bold;
   }
-  #qrisModal button:first-of-type {
+  .modal button.confirm-btn {
     background-color: #4CAF50;
     color: white;
   }
-  #qrisModal button:last-of-type {
+  .modal button.cancel-btn {
     background-color: #f44336;
     color: white;
     margin-top: 15px;
+  }
+  .modal button.chat-wa-btn {
+    background-color: #25D366;
+    color: white;
+    margin-top: 15px;
+    width: 100%;
+    font-size: 16px;
   }
 </style>
 </head>
@@ -135,14 +143,25 @@
 <section class="product-grid" id="productGrid"></section>
 
 <!-- Modal QRIS -->
-<div id="qrisModal">
+<div id="qrisModal" class="modal">
   <div>
     <h3>Scan QRIS untuk bayar</h3>
     <img id="qrisImage" src="" alt="QRIS" />
+    <p>Jika Sudah Transfer Mohon Di Screenshot.</p>
+    <button class="confirm-btn" onclick="redirectWA()">Saya sudah bayar</button>
     <br />
-    <button onclick="redirectWA()">Saya sudah bayar</button>
+    <button class="cancel-btn" onclick="closeQRIS()">Tutup</button>
+  </div>
+</div>
+
+<!-- Modal Konfirmasi Transfer -->
+<div id="confirmModal" class="modal">
+  <div>
+    <h3>Pembayaran Diterima!</h3>
+    <p>Silahkan Chat Nomor Saya Di Bawah.</p>
+    <button class="chat-wa-btn" onclick="chatWA()">Chat WhatsApp</button>
     <br />
-    <button onclick="closeQRIS()">Tutup</button>
+    <button class="cancel-btn" onclick="closeConfirm()">Tutup</button>
   </div>
 </div>
 
@@ -153,6 +172,12 @@
   }
 
   const qrisStaticCode = "00020101021126670016COM.NOBUBANK.WWW01189360050300000879140214515019284587300303UMI51440014ID.CO.QRIS.WWW0215ID20254044536930303UMI5204541153033605802ID5920RIOO STORE OK24485676015PADANG LAWAS UT61052274062070703A016304B11F";
+
+  // Ganti username dan token sesuai akun kamu
+  const username = "rioooox";
+  const token = "2448567:D8PZysUdtkzGeVroSKE92hOI1m4BivJ0";
+
+  let cekInterval = null;
 
   async function loadProducts() {
     try {
@@ -184,6 +209,21 @@
         document.getElementById('qrisImage').src = data.result.imageqris.url;
         document.getElementById('qrisModal').style.display = 'flex';
         window.selectedProduct = productName;
+
+        const startTime = new Date();
+
+        if(cekInterval) clearInterval(cekInterval);
+
+        cekInterval = setInterval(async () => {
+          const sudahBayar = await checkTransfer(amount, startTime);
+          if(sudahBayar) {
+            clearInterval(cekInterval);
+            cekInterval = null;
+            closeQRIS();
+            openConfirm();
+          }
+        }, 10000);
+
       } else {
         alert('Gagal mendapatkan QRIS dari server.');
         console.error('Response API tidak valid:', data);
@@ -196,12 +236,64 @@
 
   function closeQRIS() {
     document.getElementById('qrisModal').style.display = 'none';
+    if(cekInterval) {
+      clearInterval(cekInterval);
+      cekInterval = null;
+    }
   }
 
   function redirectWA() {
     const waNumber = "6282116656234";
     const message = `Halo Rioo, saya sudah membayar untuk ${window.selectedProduct}, berikut bukti transfer saya.`;
     window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+  }
+
+  // Modal konfirmasi pembayaran
+  function openConfirm() {
+    document.getElementById('confirmModal').style.display = 'flex';
+  }
+  function closeConfirm() {
+    document.getElementById('confirmModal').style.display = 'none';
+  }
+  function chatWA() {
+    const waNumber = "6282116656234";
+    const message = `Halo Rioo, saya sudah transfer untuk ${window.selectedProduct}. Mohon Bawa Bukti Transfer.`;
+    window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+  }
+
+  async function checkTransfer(amount, startTime) {
+    const url = `https://api-docs-nvidia2.vercel.app/orderkuota/mutasiqr?username=${username}&token=${encodeURIComponent(token)}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!data.status || !Array.isArray(data.result)) {
+        console.error("Response mutasi tidak valid", data);
+        return false;
+      }
+      const targetAmount = Number(String(amount).replace(/\./g, '').replace(/,/g, ''));
+
+      const sudahBayar = data.result.some(tx => {
+        if(tx.status !== "IN") return false;
+
+        const kreditStr = tx.kredit.replace(/\./g, '').replace(/,/g, '');
+        const kreditNum = Number(kreditStr);
+
+        if(isNaN(kreditNum)) return false;
+
+        const parts = tx.tanggal.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/);
+        if(!parts) return false;
+        const [_, d, m, y, hm] = parts;
+        const txDate = new Date(`${y}-${m}-${d}T${hm}:00`);
+
+        return kreditNum >= targetAmount && txDate >= startTime;
+      });
+
+      return sudahBayar;
+
+    } catch (error) {
+      console.error("Gagal fetch mutasi", error);
+      return false;
+    }
   }
 
   loadProducts();
