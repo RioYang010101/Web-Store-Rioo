@@ -10,8 +10,14 @@
 
     <header>
         <h1>🛒 Toko Online Saya</h1>
-        <p>Selamat datang! Silakan pilih produk yang kamu suka</p>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
     </header>
+
+    <!-- Side Menu -->
+    <nav id="sideMenu">
+        <a href="#" onclick="alert('Menu Testi Rioo diklik!')">📜 Testi Rioo</a>
+        <a href="https://wa.me/6282116656234" target="_blank">💬 Chat Penjual</a>
+    </nav>
 
     <main id="product-list"></main>
 
@@ -20,5 +26,10 @@
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        function toggleMenu() {
+            document.getElementById("sideMenu").classList.toggle("show");
+        }
+    </script>
 </body>
 </html>
