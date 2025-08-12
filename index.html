@@ -1,36 +1,119 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toko Online Rioo</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko Rioo</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #000; /* Latar hitam */
+        color: white; /* Teks putih */
+    }
+    header {
+        background-color: #111;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #333;
+    }
+    header h1 {
+        font-size: 1.5em;
+        margin: 0;
+    }
+    nav {
+        display: none;
+        flex-direction: column;
+        background-color: #111;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        border-left: 1px solid #333;
+    }
+    nav a {
+        padding: 15px;
+        text-decoration: none;
+        color: white;
+        border-bottom: 1px solid #333;
+    }
+    nav a:hover {
+        background-color: #222;
+    }
+    .hamburger {
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+    .product-card {
+        background-color: #111;
+        border: 1px solid #333;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+    }
+    .product-card img {
+        max-width: 100%;
+        border-radius: 5px;
+    }
+    .buy-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 15px;
+        background-color: white;
+        color: black;
+        border-radius: 3px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .buy-btn:hover {
+        background-color: #ddd;
+    }
+</style>
 </head>
 <body>
 
-    <header>
-        <h1>Toko Online Rioo</h1>
-        <div class="menu-icon" onclick="toggleMenu()">☰</div>
-    </header>
+<header>
+    <h1>Toko Rioo</h1>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+</header>
 
-    <!-- Side Menu -->
-    <nav id="sideMenu">
-        <div class="close-btn" onclick="toggleMenu()">✖</div>
-        <a href="https://whatsapp.com/channel/0029VbAboBY3WHTUjWfV292s" target="_blank">📜 Testi Rioo</a>
-        <a href="https://wa.me/6282116656234" target="_blank">💬 Chat Penjual</a>
-    </nav>
+<nav id="menu">
+    <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20lihat%20testimoni" target="_blank">Testi Rioo</a>
+    <a href="javascript:void(0)" onclick="toggleMenu()">❌ Tutup</a>
+</nav>
 
-    <main id="product-list"></main>
+<section class="product-grid">
+    <div class="product-card">
+        <img src="https://via.placeholder.com/250" alt="Produk 1">
+        <h2>Produk 1</h2>
+        <p>Deskripsi singkat produk 1.</p>
+        <p><strong>Rp 100.000</strong></p>
+        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%201" target="_blank" class="buy-btn">Beli Sekarang</a>
+    </div>
 
-    <footer>
-        <p>© 2025 Toko Rioo</p>
-    </footer>
+    <div class="product-card">
+        <img src="https://via.placeholder.com/250" alt="Produk 2">
+        <h2>Produk 2</h2>
+        <p>Deskripsi singkat produk 2.</p>
+        <p><strong>Rp 200.000</strong></p>
+        <a href="https://wa.me/6282116656234?text=Halo%20Rioo%2C%20saya%20mau%20beli%20Produk%202" target="_blank" class="buy-btn">Beli Sekarang</a>
+    </div>
+</section>
 
-    <script src="script.js"></script>
-    <script>
-        function toggleMenu() {
-            document.getElementById("sideMenu").classList.toggle("show");
-        }
-    </script>
+<script>
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+}
+</script>
+
 </body>
 </html>
